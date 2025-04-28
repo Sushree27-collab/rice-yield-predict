@@ -37,3 +37,36 @@ if uploaded_file is not None:
 
     # 🔥 Predict
     st.subheader('🔮 Predicted Rice Grain Yield (kg/ha)')
+
+    if uploaded_file is not None:
+    input_data = pd.read_csv(uploaded_file)
+    st.success('✅ File uploaded successfully!')
+
+    st.write('📈 Preview of Uploaded Data:')
+    st.dataframe(input_data)
+
+    # 🛡️ STEP 1: Select and fix the order of columns
+    input_data_features = input_data[['Physiological_Maturity', 'Panicle_Initiation', 'Runs', 'Anthesis', 'Condition_Encoded']]
+
+    # 🛡️ STEP 2: Force columns to numeric
+    input_data_features = input_data_features.apply(pd.to_numeric)
+
+    # 🔮 STEP 3: Predict using model
+    predictions = model.predict(input_data_features)
+
+    # 🛡️ STEP 4: Attach predictions to original input_data
+    input_data['Predicted_Grain_Yield_kg/ha'] = predictions
+
+    # 📈 STEP 5: Display updated input_data
+    st.subheader('🔮 Predicted Rice Grain Yield (kg/ha)')
+    st.dataframe(input_data)
+
+    # 📥 STEP 6: Download predictions
+    csv = input_data.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="📥 Download Prediction Results",
+        data=csv,
+        file_name='Predicted_Rice_Yield.csv',
+        mime='text/csv'
+    )
+
